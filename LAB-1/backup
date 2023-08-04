@@ -1,0 +1,164 @@
+#include <cmath>
+#include <fstream>
+#include <iostream>
+#include <random>
+
+#define IPx 1.10606015772  // intersection point
+#define IPy 0.8939398423
+// #define IPy 1
+
+double generateRandomNumber() {
+  static std::random_device rd;
+  static std::mt19937 mt(rd());
+  static std::uniform_real_distribution<double> dist(0, 2);
+  return dist(mt);
+}
+
+inline double fx1(double x) { return sin(x); }
+
+inline double fx2(double x) { return 2 - x; }
+
+inline double Fx1(double x) { return 1 - cos(x); }
+
+inline double Fx2(double x) {
+  return 1 - cos(IPx) + 2 * x - pow(x, 2) / 2 - (double)553 / 250 +
+         pow(553, 2) / (2 * pow(500, 2));
+}
+
+inline double Eta1(double x) { return acos(1 - x); }
+
+inline double Eta2(double x) {
+  return (pow(500, 2) +
+          sqrt(pow(500, 4) - 303 * pow(500, 3) -
+               250 * pow(500, 3) * cos((double)27651503943 / 25000000000) +
+               (double)62500 * pow(553, 2) - 250 * pow(500, 3) * x)) /
+         125000;
+}
+
+inline double Eta3(double x) {
+  return (pow(500, 2) -
+          sqrt(pow(500, 4) - 303 * pow(500, 3) -
+               250 * pow(500, 3) * cos((double)27651503943 / 25000000000) +
+               (double)62500 * pow(553, 2) - 250 * pow(500, 3) * x)) /
+         125000;
+}
+
+void distributionFunction(int n) {
+  double x, Ksi;
+
+  std::ofstream out("DistFunc.txt");
+
+  for (int i = 0; i < n; i++) {
+    x = generateRandomNumber();
+
+    /* if (x == 0)
+      out << x << "    " << 0 << std::endl;
+    else if (0 <= x && x <= IPx) {
+      out << x << "    " << fx1(x) << std::endl;
+    } else if (IPx < x && x <= 2) {
+      out << x << "    " << fx2(x) << std::endl;
+    } */
+
+    /* if (x == 0)
+      out << x << "    " << 0 << std::endl;
+    else if (0 <= x && x <= IPx) {
+      out << x << "    " << Fx1(x) << std::endl;
+    } else if (IPx < x && x <= 2) {
+      out << x << "    " << Fx2(x) << std::endl;
+    } */
+
+    /* if (0 <= x && x < IPy) {
+      out << x << "    " << Eta1(x) << std::endl;
+    } else if (IPx <= x) {
+      out << x << "    " << Eta2(x);
+      out << x << "    " << Eta3(x) << std::endl;
+    } */
+
+    /* if (0 <= x && x < IPy) {
+      out << i << "    " << Eta1(x) << std::endl;
+    } else if (IPx <= x) {
+      out << i << "    " << Eta2(x);
+      out << i << "    " << Eta3(x) << std::endl;
+    } */
+
+    /* if (x == 0)
+      out << x << "    " << 0 << std::endl;
+    else if (0 <= x && x <= IPx) {
+      Ksi = Fx1(x);
+      if (0 <= Ksi && Ksi < IPy) {
+        out << x << "    " << Eta1(Ksi) << std::endl;
+      } else if (IPx <= Ksi) {
+        out << x << "    " << Eta2(Ksi);
+        out << x << "    " << Eta3(Ksi) << std::endl;
+      }
+    } else if (IPx < x && x <= 2) {
+      Ksi = Fx2(x);
+      if (0 <= Ksi && Ksi < IPy) {
+        out << x << "    " << Eta1(Ksi) << std::endl;
+      } else if (IPx <= Ksi) {
+        out << x << "    " << Eta2(Ksi);
+        out << x << "    " << Eta3(Ksi) << std::endl;
+      }
+    } */
+
+    if (x == 0)
+      out << x << "    " << 0 << std::endl;
+    else if (0 <= x && x <= IPx) {
+      Ksi = fx1(x);
+      if (0 <= Ksi && Ksi < IPy) {
+        out << x << "    " << Eta1(Ksi) << std::endl;
+      } else if (IPx <= Ksi) {
+        out << x << "    " << Eta2(Ksi);
+        out << x << "    " << Eta3(Ksi) << std::endl;
+      }
+    } else if (IPx < x && x <= 2) {
+      Ksi = fx2(x);
+      if (0 <= Ksi && Ksi < IPy) {
+        out << x << "    " << Eta1(Ksi) << std::endl;
+      } else if (IPx <= Ksi) {
+        out << x << "    " << Eta2(Ksi);
+        out << x << "    " << Eta3(Ksi) << std::endl;
+      }
+    }
+  }
+
+  out.close();
+  system("gnuplot lab1.gnu");
+}
+
+void rejectionMethod(int n) {
+  double Ksi1, Ksi2, a, b;
+  std::ofstream out("DistFunc.txt");
+
+  for (int i = 0; i < n; i++) {
+    a = 0;
+    b = IPx;
+    do {
+      for (Ksi1 = generateRandomNumber(), Ksi2 = generateRandomNumber();
+           (fx1(a + (b - a) * Ksi1) <= IPy * Ksi2);
+           Ksi1 = generateRandomNumber(), Ksi2 = generateRandomNumber()) {
+      }
+    } while (0 > a + (b - a) * Ksi1 || a + (b - a) * Ksi1 > IPx);
+    out << a + (b - a) * Ksi1 << "    " << Ksi2 << std::endl;
+
+    a = IPx;
+    b = 2;
+    for (Ksi1 = generateRandomNumber(), Ksi2 = generateRandomNumber();
+         fx2(a + (b - a) * Ksi1) <= IPy * Ksi2;
+         Ksi1 = generateRandomNumber(), Ksi2 = generateRandomNumber()) {
+    }
+    out << a + (b - a) * Ksi1 << "    " << Ksi2 << std::endl;
+  }
+
+  out.close();
+  system("gnuplot lab1.gnu");
+}
+
+int main() {
+  int n = 10000;
+
+  // distributionFunction(n);
+  rejectionMethod(n);
+
+  return 0;
+}

@@ -1,0 +1,44 @@
+std::vector<double> withoutReturn(int balls, int getBalls, int redBalls) {
+  std::vector<double> p = {1, 1, 1, 1, 1, 1, 1, 1};
+
+  for (int i = 0; i < redBalls; i++) {
+    int count = i;
+    double countRed = redBalls;
+    double countBalls = balls;
+    double exceptRed = balls - redBalls;
+
+    for (int j = 0; j < getBalls; j++) {
+      if (count-- > 0) {
+        p[i] *= countRed-- / countBalls--;
+        /*         std::cout << "p[" << i << "] *= " << countRed << " / " <<
+           countBalls
+                          << " = " << p[i] << std::endl;
+                std::cout << "count = " << count << std::endl;
+                std::cout << "countRed = " << countRed << std::endl;
+                std::cout << "countBalls = " << countBalls << std::endl;
+                std::cout << "exceptRed = " << exceptRed << std::endl;
+                std::cout << "---------------------" << std::endl; */
+        /* count--;
+        countRed--;
+        countBalls--; */
+      } else {
+        p[i] *= exceptRed-- / countBalls--;
+        /*         std::cout << "p[" << i << "] *= " << exceptRed << " / " <<
+           countBalls
+                          << " = " << p[i] << std::endl;
+                std::cout << "count = " << count << std::endl;
+                std::cout << "countRed = " << countRed << std::endl;
+                std::cout << "countBalls = " << countBalls << std::endl;
+                std::cout << "exceptRed = " << exceptRed << std::endl;
+                std::cout << "---------------------" << std::endl; */
+        /* exceptRed--;
+        countBalls--; */
+      }
+    }
+
+    p[i] *= CnK(getBalls, i);
+    std::cout << "p[" << i << "] = " << p[i] << std::endl;
+  }
+
+  return p;
+}
